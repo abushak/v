@@ -1,0 +1,10 @@
+type: module
+name: 'Ajax assets plus'
+description: 'Improves ajax assets resolver.'
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2017-09-07
+version: '8.x-1.0-alpha1'
+core: '8.x'
+project: 'ajax_assets_plus'
+datestamp: 1504793046

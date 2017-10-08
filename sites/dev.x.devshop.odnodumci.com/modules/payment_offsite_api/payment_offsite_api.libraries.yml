@@ -1,0 +1,7 @@
+autosubmit:
+  version: VERSION
+  js:
+    js/redirect_autosubmit.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

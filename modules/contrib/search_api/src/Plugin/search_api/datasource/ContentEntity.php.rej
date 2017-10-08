@@ -1,0 +1,14 @@
+--- src/Plugin/search_api/datasource/ContentEntity.php
++++ src/Plugin/search_api/datasource/ContentEntity.php
+@@ -619,7 +619,10 @@
+    */
+   public function getItemUrl(ComplexDataInterface $item) {
+     if ($item instanceof EntityAdapter) {
+-      return $item->getValue()->urlInfo('canonical');
++      $entity = $item->getValue();
++      if ($entity->hasLinkTemplate('canonical')) {
++        return $entity->toUrl('canonical');
++      }
+     }
+     return NULL;
+   }

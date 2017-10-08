@@ -1,0 +1,8 @@
+name = Liqpay payment
+
+; Information added by Drupal.org packaging script on 2016-10-01
+version = "8.x-1.0-rc1"
+core = "8.x"
+project = "liqpay_payment"
+datestamp = "1475330040"
+

@@ -1,0 +1,35 @@
+id: liqpay
+label: 'Liqpay'
+ownerId: 1
+pluginConfiguration:
+  message_text: 'In addition to the order amount liqpay fee can be charged.'
+  message_text_format: plain_text
+  auto_submit: true
+  verbose: false
+  ipn_statuses:
+    success: payment_success
+    failure: payment_failed
+    error: payment_failed
+    reversed: payment_reversed
+    sandbox: payment_success
+    otp_verify: payment_pending
+    3ds_verify: payment_pending
+    cvv_verify: payment_pending
+    sender_verify: payment_pending
+    receiver_verify: payment_pending
+    wait_secure: payment_pending
+    wait_accept: payment_pending
+  config:
+    version: 3
+    public_key: ''
+    private_key: ''
+    action: 'pay'
+    action_url: ''
+    sandbox: '1'
+    redirect_url: ''
+pluginId: payment_liqpay
+status: false
+dependencies:
+  enforced:
+    module:
+      - liqpay_payment

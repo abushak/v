@@ -1,0 +1,13 @@
+name: Ajax form Entity
+# core: 8.x
+description: Ajaxify entity forms.
+package: Administration
+type: module
+# version: 8.x-dev
+configure: ajax_form_entity.settings
+
+# Information added by Drupal.org packaging script on 2017-01-21
+version: '8.x-1.0-alpha1'
+core: '8.x'
+project: 'ajax_form_entity'
+datestamp: 1485003188

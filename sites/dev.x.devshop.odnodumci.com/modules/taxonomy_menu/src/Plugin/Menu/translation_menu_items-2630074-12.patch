@@ -1,0 +1,211 @@
+diff --git a/src/Plugin/Menu/TaxonomyMenuMenuLink.php b/src/Plugin/Menu/TaxonomyMenuMenuLink.php
+index b31b193..04a96f0 100644
+--- a/src/Plugin/Menu/TaxonomyMenuMenuLink.php
++++ b/src/Plugin/Menu/TaxonomyMenuMenuLink.php
+@@ -7,10 +7,11 @@
+ 
+ namespace Drupal\taxonomy_menu\Plugin\Menu;
+ 
+-use Drupal\Core\Entity\EntityManagerInterface;
++use Drupal\Core\Entity\EntityRepositoryInterface;
+ use Drupal\Core\Menu\MenuLinkBase;
+ use Drupal\Core\Menu\StaticMenuLinkOverridesInterface;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\taxonomy\TermStorageInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+@@ -35,11 +36,18 @@ class TaxonomyMenuMenuLink extends MenuLinkBase implements ContainerFactoryPlugi
+   );
+ 
+   /**
+-   * The entity manager.
++   * The taxonomy term storage.
+    *
+-   * @var \Drupal\Core\Entity\EntityManager
++   * @var TermStorageInterface
+    */
+-  protected $entityManager;
++  protected $termStorage;
++
++  /**
++   * The entity repository.
++   *
++   * @var EntityRepositoryInterface
++   */
++  protected $entityRepository;
+ 
+   /**
+    * The static menu link service used to store updates to weight/parent etc.
+@@ -51,28 +59,32 @@ class TaxonomyMenuMenuLink extends MenuLinkBase implements ContainerFactoryPlugi
+   /**
+    * Constructs a new TaxonomyMenuMenuLink.
+    *
+-   * @param array                                      $configuration
++   * @param array $configuration
+    *   A configuration array containing information about the plugin instance.
+-   * @param string                                     $plugin_id
++   * @param string $plugin_id
+    *   The plugin_id for the plugin instance.
+-   * @param mixed                                      $plugin_definition
++   * @param mixed $plugin_definition
+    *   The plugin implementation definition.
+-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+-   *   The entity manager
+-   * @param \Drupal\views\ViewExecutableFactory        $view_executable_factory
+-   *   The view executable factory
++   * @param TermStorageInterface $term_storage
++   *   The taxonomy term storage
++   * @param EntityRepositoryInterface $entity_repository
++   *   The entity repository
++   * @param StaticMenuLinkOverridesInterface $static_override
++   *   The link overrides
+    */
+   public function __construct(
+     array $configuration,
+     $plugin_id,
+     $plugin_definition,
+-    EntityManagerInterface $entity_manager,
++    TermStorageInterface $term_storage,
++    EntityRepositoryInterface $entity_repository,
+     StaticMenuLinkOverridesInterface $static_override
+   ) {
+     $this->configuration = $configuration;
+     $this->pluginId = $plugin_id;
+     $this->pluginDefinition = $plugin_definition;
+-    $this->entityManager = $entity_manager;
++    $this->termStorage = $term_storage;
++    $this->entityRepository = $entity_repository;
+     $this->staticOverride = $static_override;
+   }
+ 
+@@ -84,7 +96,8 @@ public static function create(ContainerInterface $container, array $configuratio
+       $configuration,
+       $plugin_id,
+       $plugin_definition,
+-      $container->get('entity.manager'),
++      $container->get('entity_type.manager')->getStorage('taxonomy_term'),
++      $container->get('entity.repository'),
+       $container->get('menu_link.static.overrides')
+     );
+   }
+@@ -93,13 +106,14 @@ public static function create(ContainerInterface $container, array $configuratio
+    * {@inheritdoc}
+    */
+   public function getTitle() {
+-    /** @var $link \Drupal\taxonomy\Entity\Term */
+-    $link = $this->entityManager->getStorage('taxonomy_term')
++    /** @var $term \Drupal\taxonomy\Entity\Term */
++    $term = $this->termStorage
+       ->load($this->pluginDefinition['metadata']['taxonomy_term_id']);
+-    if (!empty($link)) {
+-      return $link->label();
++    if (!empty($term)) {
++      $term = $this->entityRepository->getTranslationFromContext($term);
++      return $term->label();
+     }
+-    return NULL;
++    return '';
+   }
+ 
+   /**
+@@ -107,12 +121,13 @@ public function getTitle() {
+    */
+   public function getDescription() {
+     /** @var $link \Drupal\taxonomy\Entity\Term */
+-    $link = $this->entityManager->getStorage('taxonomy_term')
++    $term = $this->termStorage
+       ->load($this->pluginDefinition['metadata']['taxonomy_term_id']);
+-    if (!empty($link)) {
+-      return $link->getDescription();
++    if (!empty($term)) {
++      $term = $this->entityRepository->getTranslationFromContext($term);
++      return $term->getDescription();
+     }
+-    return NULL;
++    return '';
+   }
+ 
+   /**
+diff --git a/tests/src/Unit/Plugin/Menu/TaxonomyMenuMenuLinkTest.php b/tests/src/Unit/Plugin/Menu/TaxonomyMenuMenuLinkTest.php
+new file mode 100644
+index 0000000..de82bb5
+--- /dev/null
++++ b/tests/src/Unit/Plugin/Menu/TaxonomyMenuMenuLinkTest.php
+@@ -0,0 +1,75 @@
++<?php
++
++namespace Drupal\Tests\taxonomy_menu\Unit;
++
++use Drupal\Core\Entity\EntityRepositoryInterface;
++use Drupal\Core\Menu\StaticMenuLinkOverridesInterface;
++use Drupal\taxonomy\TermInterface;
++use Drupal\taxonomy\TermStorageInterface;
++use Drupal\taxonomy_menu\Plugin\Menu\TaxonomyMenuMenuLink;
++use Drupal\Tests\UnitTestCase;
++
++/**
++ *
++ * @covers TaxonomyMenuMenuLink
++ *
++ * @group taxonomy_menu
++ *
++ * @property array configuration
++ * @property string plugin_id
++ * @property array plugin_definition
++ * @property \Prophecy\Prophecy\ObjectProphecy term_storage
++ * @property \Prophecy\Prophecy\ObjectProphecy entity_repository
++ * @property \Prophecy\Prophecy\ObjectProphecy static_overrides
++ */
++class TaxonomyMenuMenuLinkTest extends UnitTestCase {
++
++  public function setUp()
++  {
++    parent::setUp();
++
++    $this->configuration = [];
++    $this->plugin_id = 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.categories.1';
++    $this->plugin_definition = ['metadata' => ['taxonomy_term_id' => '1']];
++    $this->term_storage = $this->prophesize(TermStorageInterface::class);
++    $this->entity_repository = $this
++      ->prophesize(EntityRepositoryInterface::class);
++    $this->static_overrides = $this
++      ->prophesize(StaticMenuLinkOverridesInterface::class);
++
++    $this->subject = new TaxonomyMenuMenuLink(
++      $this->configuration,
++      $this->plugin_id,
++      $this->plugin_definition,
++      $this->term_storage->reveal(),
++      $this->entity_repository->reveal(),
++      $this->static_overrides->reveal()
++    );
++  }
++
++  /**
++   * Test that the menu link titles and description are translated
++   */
++  public function testTranslatedMenuLink() {
++    // Arrange
++    $original = $this->prophesize(TermInterface::class);
++    $original->label()->willReturn('Original title');
++    $original->getDescription()->willReturn('Original description');
++
++    $translated = $this->prophesize(TermInterface::class);
++    $translated->label()->willReturn('Translated title');
++    $translated->getDescription()->willReturn('Translated description');
++
++    $this->term_storage->load('1')->willReturn($original->reveal());
++    $this->entity_repository->getTranslationFromContext($original->reveal())
++      ->willReturn($translated->reveal());
++
++    // Act
++    $title = $this->subject->getTitle();
++    $description = $this->subject->getDescription();
++
++    // Assert
++    $this->assertEquals('Translated title', $title);
++    $this->assertEquals('Translated description', $description);
++  }
++}
+\ No newline at end of file

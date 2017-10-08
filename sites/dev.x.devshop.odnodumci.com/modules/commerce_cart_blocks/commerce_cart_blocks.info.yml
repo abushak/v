@@ -1,0 +1,14 @@
+name: Commerce Cart Blocks
+type: module
+description: 'Provides new types of Cart blocks for Drupal Commerce.'
+# version: 8.x-1.x
+# core: 8.x
+package: Commerce
+dependencies:
+  - commerce_cart
+
+# Information added by Drupal.org packaging script on 2017-04-15
+version: '8.x-1.0-alpha1'
+core: '8.x'
+project: 'commerce_cart_blocks'
+datestamp: 1492220050

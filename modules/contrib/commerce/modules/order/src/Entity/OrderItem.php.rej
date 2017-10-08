@@ -1,0 +1,20 @@
+--- modules/order/src/Entity/OrderItem.php
++++ modules/order/src/Entity/OrderItem.php
+@@ -299,9 +353,16 @@
+       ->setDescription(t('The number of purchased units.'))
+       ->setReadOnly(TRUE)
+       ->setSetting('unsigned', TRUE)
++      ->setSetting('precision', 12)
++      ->setSetting('scale', 3)
++      ->setSetting('max', '367384.999')
+       ->setDefaultValue(1)
+       ->setDisplayOptions('form', [
+-        'type' => 'number',
++        'type' => 'commerce_number',
++        'weight' => 1,
++      ])
++      ->setDisplayOptions('add_to_cart', [
++        'type' => 'commerce_number',
+         'weight' => 1,
+       ])
+       ->setDisplayConfigurable('form', TRUE)

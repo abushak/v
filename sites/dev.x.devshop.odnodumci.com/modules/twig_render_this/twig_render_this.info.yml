@@ -1,0 +1,10 @@
+name: Twig Render This
+description: 'Render entity fields in Twig templates with simple filter.'
+type: module
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2017-06-30
+version: '8.x-1.00'
+core: '8.x'
+project: 'twig_render_this'
+datestamp: 1498865345

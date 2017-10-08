@@ -1,0 +1,15 @@
+name: Commerce Add-on
+description: Provides an add-on purchasable entity
+type: module
+# core: 8.x
+dependencies:
+  - entity
+  - commerce
+  - commerce:commerce_price
+  - commerce:commerce_order
+
+# Information added by Drupal.org packaging script on 2017-08-23
+version: '8.x-1.0-alpha1'
+core: '8.x'
+project: 'commerce_addon'
+datestamp: 1503512946

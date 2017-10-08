@@ -1,0 +1,29 @@
+plugin.plugin_configuration.payment_method_configuration.payment_liqpay:
+  type: plugin.plugin_configuration.payment_method_configuration.payment_offsite_api
+  label: 'Liqpay settings'
+  mapping:
+    config:
+      type: mapping
+      label: 'Liqpay configuration'
+      mapping:
+        version:
+          label: 'API version'
+          type: number
+        public_key:
+          label: 'Store public key'
+          type: string
+        private_key:
+          label: 'Store private key'
+          type: string
+        action:
+          label: 'Action'
+          type: string
+        action_url:
+          label: 'Action url'
+          type: string
+        sandbox:
+          label: 'Sandbox'
+          type: number
+        redirect_url:
+          label: 'Redirect URL'
+          type: number

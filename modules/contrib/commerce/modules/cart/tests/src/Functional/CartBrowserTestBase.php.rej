@@ -1,0 +1,14 @@
+--- modules/cart/tests/src/Functional/CartBrowserTestBase.php
++++ modules/cart/tests/src/Functional/CartBrowserTestBase.php
+@@ -221,9 +221,9 @@
+    */
+   protected function assertOrderItemInOrder(ProductVariationInterface $variation, OrderItemInterface $order_item, $quantity = 1) {
+     $this->assertEquals($order_item->getTitle(), $variation->getOrderItemTitle());
+-    $this->assertTrue(($order_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
++    $this->assertTrue(($order_item->getItemsQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
+       '@product' => $order_item->getTitle(),
+-      '@quantity' => $order_item->getQuantity(),
++      '@quantity' => $order_item->getItemsQuantity(),
+     ]));
+   }
+ 

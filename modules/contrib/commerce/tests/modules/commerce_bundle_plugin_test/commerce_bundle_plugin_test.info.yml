@@ -1,0 +1,13 @@
+name: 'Commerce bundle plugin test'
+type: module
+description: 'Module for testing bundle plugins.'
+package: Testing
+# core: 8.x
+dependencies:
+  - commerce
+
+# Information added by Drupal.org packaging script on 2017-09-13
+version: '8.x-2.0-rc2+29-dev'
+core: '8.x'
+project: 'commerce'
+datestamp: 1505316849
